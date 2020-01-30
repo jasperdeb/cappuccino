@@ -9,7 +9,7 @@
 
 // ************************************** CPView **************************************
 
-@implementation CPResiableImageView : CPView
+@implementation CPResizableImageView : CPView
 {
     CALayer     _rootLayer;
 
@@ -453,7 +453,7 @@
 
 @end
 
-@implementation CPResiableImageView (CPCoding)
+@implementation CPResizableImageView (CPCoding)
 
 - (id)initWithCoder:(CPCoder)aCoder
 {
