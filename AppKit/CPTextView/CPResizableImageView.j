@@ -26,6 +26,9 @@
     float       _deltaYUp;
     float       _deltaYDown;
 
+    float       sizeX @accessors;
+    float       sizeY @accessors;
+
     float       _rotationRadians;
     float       _scale;
     float       _scaleX;
@@ -39,6 +42,8 @@
 
 - (id)initWithImage:(CPImage)anImage
 {
+    console.log("initWithImage");
+
     self = [super initWithFrame:CGRectMake(0.0, 0.0, [anImage size].width, [anImage size].height)];
 
     if (self)
@@ -73,7 +78,11 @@
 
         _image = anImage;
         if (_image)
+        {
             [_imageLayer setBounds:CGRectMake(0.0, 0.0, [_image size].width, [_image size].height)];
+            sizeX = [_image size].width;
+            sizeY = [_image size].height;
+        }
 
         [_rootLayer addSublayer:_imageLayer];
         [_imageLayer setNeedsDisplay];
@@ -299,6 +308,15 @@
 
             [_rootLayer setBounds:CGRectMake(0.0, 0.0, [self frameSize].width+[anEvent deltaX], [self frameSize].height+[anEvent deltaY])];
 
+            // Update values of width and heigth of _image
+            //[_image setSize:CGSizeMake(, [self frameSize].height + [anEvent deltaY])];     
+            //[_image setFrame:CGRectMake(0, 0, [self frameSize].width + [anEvent deltaX], [self frameSize].height + [anEvent deltaY])];
+
+            sizeX = [self frameSize].width + [anEvent deltaX];
+            sizeY = [self frameSize].height + [anEvent deltaY];
+
+            console.log("Resize: heightX: "+sizeX + ", widthY: " + sizeY);
+
             [_imageLayer setBounds:CGRectMake(0.0, 0.0, [self frameSize].width+[anEvent deltaX], [self frameSize].height+[anEvent deltaY])];
             [self setScaleX:([self frameSize].width+[anEvent deltaX])/[self frameSize].width scaleY:([self frameSize].height+[anEvent deltaY])/[self frameSize].height];
 
@@ -473,6 +491,9 @@
         _positionX = [aCoder decodeFloatForKey:"_positionX"];
         _positionY = [aCoder decodeFloatForKey:"_positionY"];
 
+        sizeX = [aCoder decodeFloatForKey:"_sizeX"];
+        sizeY = [aCoder decodeFloatForKey:"_sizeY"];
+
         _startPoint_local = [aCoder decodePointForKey:"_startPoint_local"];
 
         crop = [aCoder decodeBoolForKey:"crop"];
@@ -480,7 +501,9 @@
 
         _image = [aCoder decodeObjectForKey:"_image"];
 
+        console.log("Init with coder: height: "+sizeX + ", width: " +sizeY);
         // Init
+        _rootLayer = [CALayer layer];
         [self setWantsLayer:YES];
         [self setLayer:_rootLayer];
 
@@ -527,6 +550,8 @@
 {
     [super encodeWithCoder:aCoder];
 
+    console.log("Encode with coder: height: "+ sizeX + ", width: " + sizeY);
+
     [aCoder encodeFloat:_deltaXLeft forKey:"_deltaXLeft"];
     [aCoder encodeFloat:_deltaXRight forKey:"_deltaXRight"];
     [aCoder encodeFloat:_deltaYUp forKey:"_deltaYUp"];
@@ -538,6 +563,9 @@
     [aCoder encodeFloat:_scaleY forKey:"_scaleY"];
     [aCoder encodeFloat:_positionX forKey:"_positionX"];
     [aCoder encodeFloat:_positionY forKey:"_positionY"];
+
+    [aCoder encodeFloat:sizeX forKey:"_sizeX"];
+    [aCoder encodeFloat:sizeY forKey:"_sizeY"];
 
     [aCoder encodeBool:crop forKey:"crop"];
     [aCoder encodeBool:resize forKey:"resize"];
